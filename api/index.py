@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify
-import cloudscraper
+import requests
 from bs4 import BeautifulSoup
 from urllib.parse import quote
 
@@ -9,11 +9,13 @@ app = Flask(__name__)
 def scrape_pdf_drive(query):
     # URL encode the query to handle special characters
     encoded_query = quote(query)
-    scraper = cloudscraper.create_scraper()
     url = f"https://www.pdfdrive.com/search?q={encoded_query}"
     
-    response = scraper.get(url)
-    if response.status_code != 200:
+    try:
+        response = requests.get(url)  # Set a timeout for the request
+        response.raise_for_status()  # Raise an exception for HTTP errors
+    except (requests.RequestException, ValueError) as e:
+        print(f"Request failed: {e}")
         return []
 
     # Use 'html.parser' or 'lxml' to avoid dependency issues with 'html5lib'
@@ -22,12 +24,14 @@ def scrape_pdf_drive(query):
     
     data = []
     for result in results:
-        title = result.find('img')["title"]
-        link = result.find('a')["href"]
-        image = result.find('img')["src"]
+        title = result.find('img').get("title", "No title")
+        link = result.find('a').get("href", "")
+        image = result.find('img').get("src", "")
+        if link:
+            link = f"https://www.pdfdrive.com{link}"
         data.append({
             'title': title,
-            'link': f"https://www.pdfdrive.com{link}",
+            'link': link,
             'image': image
         })
     
