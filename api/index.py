@@ -1,9 +1,12 @@
 from flask import Flask, request, jsonify
-import requests
+import cloudscraper
 from bs4 import BeautifulSoup
 from urllib.parse import quote
 
 app = Flask(__name__)
+
+# Initialize cloudscraper
+scraper = cloudscraper.create_scraper()
 
 # Function to scrape PDFDrive
 def scrape_pdf_drive(query):
@@ -12,13 +15,12 @@ def scrape_pdf_drive(query):
     url = f"https://www.pdfdrive.com/search?q={encoded_query}"
     
     try:
-        response = requests.get(url)  # Set a timeout for the request
+        response = scraper.get(url)  # Use cloudscraper for the request
         response.raise_for_status()  # Raise an exception for HTTP errors
     except (requests.RequestException, ValueError) as e:
         print(f"Request failed: {e}")
         return []
 
-    # Use 'html.parser' or 'lxml' to avoid dependency issues with 'html5lib'
     soup = BeautifulSoup(response.content, 'html.parser')
     results = soup.find_all('div', class_='file-left')
     
@@ -37,19 +39,17 @@ def scrape_pdf_drive(query):
     
     return data
 
+# Scrape Science category
 def scrape_pdf_drive_science():
-    # URL encode the query to handle special characters
-    
     url = f"https://www.pdfdrive.com/category/14"
     
     try:
-        response = requests.get(url)  # Set a timeout for the request
-        response.raise_for_status()  # Raise an exception for HTTP errors
+        response = scraper.get(url)
+        response.raise_for_status()
     except (requests.RequestException, ValueError) as e:
         print(f"Request failed: {e}")
         return []
 
-    # Use 'html.parser' or 'lxml' to avoid dependency issues with 'html5lib'
     soup = BeautifulSoup(response.content, 'html.parser')
     results = soup.find_all('div', class_='file-left')
     
@@ -68,19 +68,17 @@ def scrape_pdf_drive_science():
     
     return data
 
+# Scrape History category
 def scrape_pdf_drive_history():
-    # URL encode the query to handle special characters
-    
     url = f"https://www.pdfdrive.com/category/15"
     
     try:
-        response = requests.get(url)  # Set a timeout for the request
-        response.raise_for_status()  # Raise an exception for HTTP errors
+        response = scraper.get(url)
+        response.raise_for_status()
     except (requests.RequestException, ValueError) as e:
         print(f"Request failed: {e}")
         return []
 
-    # Use 'html.parser' or 'lxml' to avoid dependency issues with 'html5lib'
     soup = BeautifulSoup(response.content, 'html.parser')
     results = soup.find_all('div', class_='file-left')
     
@@ -99,19 +97,17 @@ def scrape_pdf_drive_history():
     
     return data
 
+# Scrape Fitness category
 def scrape_pdf_drive_fit():
-    # URL encode the query to handle special characters
-    
     url = f"https://www.pdfdrive.com/category/8"
     
     try:
-        response = requests.get(url)  # Set a timeout for the request
-        response.raise_for_status()  # Raise an exception for HTTP errors
+        response = scraper.get(url)
+        response.raise_for_status()
     except (requests.RequestException, ValueError) as e:
         print(f"Request failed: {e}")
         return []
 
-    # Use 'html.parser' or 'lxml' to avoid dependency issues with 'html5lib'
     soup = BeautifulSoup(response.content, 'html.parser')
     results = soup.find_all('div', class_='file-left')
     
@@ -130,19 +126,17 @@ def scrape_pdf_drive_fit():
     
     return data
 
+# Scrape Art category
 def scrape_pdf_drive_art():
-    # URL encode the query to handle special characters
-    
     url = f"https://www.pdfdrive.com/category/1"
     
     try:
-        response = requests.get(url)  # Set a timeout for the request
-        response.raise_for_status()  # Raise an exception for HTTP errors
+        response = scraper.get(url)
+        response.raise_for_status()
     except (requests.RequestException, ValueError) as e:
         print(f"Request failed: {e}")
         return []
 
-    # Use 'html.parser' or 'lxml' to avoid dependency issues with 'html5lib'
     soup = BeautifulSoup(response.content, 'html.parser')
     results = soup.find_all('div', class_='file-left')
     
@@ -161,19 +155,17 @@ def scrape_pdf_drive_art():
     
     return data
 
+# Scrape Technology category
 def scrape_pdf_drive_tech():
-    # URL encode the query to handle special characters
-    
     url = f"https://www.pdfdrive.com/category/5"
     
     try:
-        response = requests.get(url)  # Set a timeout for the request
-        response.raise_for_status()  # Raise an exception for HTTP errors
+        response = scraper.get(url)
+        response.raise_for_status()
     except (requests.RequestException, ValueError) as e:
         print(f"Request failed: {e}")
         return []
 
-    # Use 'html.parser' or 'lxml' to avoid dependency issues with 'html5lib'
     soup = BeautifulSoup(response.content, 'html.parser')
     results = soup.find_all('div', class_='file-left')
     
@@ -192,19 +184,17 @@ def scrape_pdf_drive_tech():
     
     return data
 
+# Scrape Health category
 def scrape_pdf_drive_health():
-    # URL encode the query to handle special characters
-    
     url = f"https://www.pdfdrive.com/category/112"
     
     try:
-        response = requests.get(url)  # Set a timeout for the request
-        response.raise_for_status()  # Raise an exception for HTTP errors
+        response = scraper.get(url)
+        response.raise_for_status()
     except (requests.RequestException, ValueError) as e:
         print(f"Request failed: {e}")
         return []
 
-    # Use 'html.parser' or 'lxml' to avoid dependency issues with 'html5lib'
     soup = BeautifulSoup(response.content, 'html.parser')
     results = soup.find_all('div', class_='file-left')
     
@@ -222,7 +212,6 @@ def scrape_pdf_drive_health():
         })
     
     return data
-
 
 @app.route("/")
 def welcome():
@@ -247,24 +236,20 @@ def his():
     results = scrape_pdf_drive_history()
     return jsonify({"data": results})
 
-
 @app.route("/fit")
 def fit():
     results = scrape_pdf_drive_fit()
     return jsonify({"data": results})
-
 
 @app.route("/art")
 def art():
     results = scrape_pdf_drive_art()
     return jsonify({"data": results})
 
-
 @app.route("/tech")
 def tec():
     results = scrape_pdf_drive_tech()
     return jsonify({"data": results})
-
 
 @app.route("/health")
 def hea():
